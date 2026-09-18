@@ -559,10 +559,27 @@ window.PROGRAMS = [
    if(t.includes('màster')) return 'M';
    return 'U';
  }
+ function imageForProgram(p,prefix=''){
+   const base=(prefix?prefix+'/':'')+'assets/images/';
+   const slug=(p.slug||'').toLowerCase();
+   const tone=(p.tone||'').toLowerCase();
+   if(slug.includes('sport')) return base+'sports.jpg';
+   if(slug.includes('omics') || slug.includes('bio')) return base+'bioscience.jpg';
+   if(slug.includes('traduccio') || slug.includes('catala') || slug.includes('lleng')) return base+'languages.jpg';
+   if(slug.includes('documental') || slug.includes('comunicacio') || slug.includes('peritatge')) return base+'documentary.jpg';
+   if(slug.includes('neurolog') || slug.includes('neuro') || slug.includes('estimulacio')) return base+'neuro.jpg';
+   if(slug.includes('palli') || slug.includes('aicp') || slug.includes('cures') || slug.includes('anest') || slug.includes('dolor') || slug.includes('malaltia-mental') || slug.includes('discapacitat')) return base+'care.jpg';
+   if(slug.includes('dades') || slug.includes('data') || slug.includes('ia') || slug.includes('transformacio')) return base+'data-ai.jpg';
+   if(slug.includes('educacio') || slug.includes('professorat')) return base+'education.jpg';
+   if(slug.includes('mba') || slug.includes('empresa') || slug.includes('vendes') || slug.includes('lideratge') || slug.includes('family-business')) return base+'business.jpg';
+   const fallbacks={empresa:'business.jpg',esport:'sports.jpg',educacio:'education.jpg',salut:'care.jpg',social:'documentary.jpg',arts:'documentary.jpg',biociencies:'bioscience.jpg',llengues:'languages.jpg',comunicacio:'documentary.jpg'};
+   return base+(fallbacks[tone]||'business.jpg');
+ }
  function card(p){
    const metas=[p.mode,p.location,p.start].filter(Boolean).map(x=>`<span>${escapeHtml(x)}</span>`).join('');
-   return `<a class="card program-card" data-area="${escapeHtml(p.area.toLowerCase())}" data-mode="${escapeHtml(p.mode.toLowerCase())}" data-type="${escapeHtml(p.type.toLowerCase())}" href="programes/${p.slug}.html">
-     <div class="visual ${p.tone||'empresa'}">
+   return `<a class="card program-card" data-slug="${escapeHtml(p.slug)}" data-area="${escapeHtml(p.area.toLowerCase())}" data-mode="${escapeHtml(p.mode.toLowerCase())}" data-type="${escapeHtml(p.type.toLowerCase())}" href="programes/${p.slug}.html">
+     <div class="visual ${p.tone||'empresa'}" style="--cover-image:url('${imageForProgram(p)}')">
+       <div class="visual-photo"></div>
        <span class="badge">${escapeHtml(p.status)}</span>
        <div class="visual-inner">
          <div class="cover-head">
@@ -590,7 +607,7 @@ window.PROGRAMS = [
    document.body.classList.add('page-offer');
    grid.innerHTML=P.map(card).join('');
    const q=document.querySelector('#q'),area=document.querySelector('#area'),mode=document.querySelector('#mode'),type=document.querySelector('#type'),count=document.querySelector('#resultCount');
-   const norm=s=>(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+   const norm=s=>(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
    function updateStage(){
      const max=Math.max(document.documentElement.scrollHeight-innerHeight,1);
      const r=scrollY/max;
@@ -617,6 +634,7 @@ window.PROGRAMS = [
  function renderProgram(){
    const slug=document.body.dataset.program; if(!slug)return;
    const p=bySlug[slug]; if(!p){document.querySelector('#app').innerHTML='<div class="container section"><h1>Programa no trobat</h1></div>';return}
+   document.body.classList.add('page-program');
    document.title=p.title+' | Escola de Postgrau';
    const extra=(p.facts||[]).map(([k,v])=>`<div class="fact"><small>${escapeHtml(k)}</small><b>${escapeHtml(v)}</b></div>`).join('');
    const highlights=(p.highlights||[]).map((h,i)=>`<div class="highlight"><span>0${i+1}</span>${escapeHtml(h)}</div>`).join('');
@@ -636,6 +654,13 @@ window.PROGRAMS = [
       <div class="fact"><small>Inici</small><b>${escapeHtml(p.start)}</b></div>${extra}
     </div></div>
    </div></section>
+   <section class="program-showcase"><div class="container"><div class="program-media ${p.tone||'empresa'} reveal" style="--cover-image:url('${imageForProgram(p,'..')}')">
+      <div class="program-media-photo"></div>
+      <div class="program-media-overlay">
+        <div class="program-media-top"><span class="media-pill">${escapeHtml(typeTag(p))}</span><span class="media-pill ghost">${escapeHtml(areaTag(p))}</span></div>
+        <div class="program-media-bottom"><h3>${escapeHtml(p.title)}</h3><p>${escapeHtml(p.intro)}</p></div>
+      </div>
+   </div></div></section>
    <div class="sticky-tabs"><div class="container tabs"><a href="#perque">Per què aquest programa?</a><a href="#programa">Programa</a><a href="#experiencia">Experiència</a><a href="#admissio">Informació i admissió</a></div></div>
    <section class="section" id="perque"><div class="container two-col">
     <div class="content reveal"><div class="eyebrow">El programa</div><h2>${escapeHtml(p.claim)}</h2><p>${escapeHtml(p.intro)}</p>
@@ -658,7 +683,6 @@ window.PROGRAMS = [
      <div class="form"><form data-demo-form><label>Nom i cognoms</label><input placeholder="Nom"><label>Correu electrònic</label><input placeholder="nom@exemple.com"><label>Què t’agradaria saber?</label><textarea placeholder="Explica’ns breument què busques..."></textarea><button class="btn btn-red" style="width:100%;margin-top:12px">Sol·licitar informació</button></form></div>
    </div></div></section>
    </main>`+footer();
-   // bind reveals and accordion after dynamic render
    const io2=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io2.unobserve(e.target)}}),{threshold:.12});
    document.querySelectorAll('.reveal,.stagger').forEach(el=>io2.observe(el));
    document.querySelectorAll('[data-demo-form]').forEach(f=>f.addEventListener('submit',e=>{e.preventDefault();const t=document.querySelector('.toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600)}));

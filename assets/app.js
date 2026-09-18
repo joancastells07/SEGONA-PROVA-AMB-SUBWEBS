@@ -5,6 +5,17 @@ window.addEventListener('scroll',()=>{
  const max=document.documentElement.scrollHeight-innerHeight;
  if(progress)progress.style.width=(max>0?scrollY/max*100:0)+'%';
 });
+
+function syncScrollStage(){
+ const themed=document.body.classList.contains('page-home')||document.body.classList.contains('page-offer')||document.body.classList.contains('page-program');
+ if(!themed) return;
+ const max=Math.max(document.documentElement.scrollHeight-innerHeight,1);
+ const r=scrollY/max;
+ const stage=r<.22?'1':r<.48?'2':r<.74?'3':'4';
+ document.body.setAttribute('data-scroll-stage',stage);
+}
+window.addEventListener('load',syncScrollStage);
+window.addEventListener('scroll',syncScrollStage,{passive:true});
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
 document.querySelectorAll('.reveal,.stagger').forEach(el=>io.observe(el));
 document.addEventListener('click',e=>{
