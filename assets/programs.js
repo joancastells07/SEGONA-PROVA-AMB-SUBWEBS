@@ -539,17 +539,64 @@ window.PROGRAMS = [
    </div><div class="footer-bottom"><span>Prototip conceptual · Escola de Postgrau UVic-UCC</span><span>Privacitat · Avís legal · Accessibilitat</span></div></div></footer>
    <div class="toast">Gràcies! En producció, aquest formulari enviaria la sol·licitud.</div>`;
  }
+
+ function typeTag(p){
+   const t=(p.type||'').toLowerCase();
+   if(t.includes('micro')) return 'Microcredencial';
+   if(t.includes('curs')) return 'Curs';
+   if(t.includes('postgrau')) return 'Postgrau';
+   if(t.includes('màster')) return 'Màster';
+   return p.type||'Programa';
+ }
+ function areaTag(p){
+   return (p.area||'Formació').split('·')[0].trim();
+ }
+ function themeLetter(p){
+   const t=(p.type||'').toLowerCase();
+   if(t.includes('micro')) return 'µ';
+   if(t.includes('curs')) return 'C';
+   if(t.includes('postgrau')) return 'P';
+   if(t.includes('màster')) return 'M';
+   return 'U';
+ }
  function card(p){
    const metas=[p.mode,p.location,p.start].filter(Boolean).map(x=>`<span>${escapeHtml(x)}</span>`).join('');
    return `<a class="card program-card" data-area="${escapeHtml(p.area.toLowerCase())}" data-mode="${escapeHtml(p.mode.toLowerCase())}" data-type="${escapeHtml(p.type.toLowerCase())}" href="programes/${p.slug}.html">
-     <div class="visual ${p.tone||'empresa'}"><span class="badge">${escapeHtml(p.status)}</span></div>
+     <div class="visual ${p.tone||'empresa'}">
+       <span class="badge">${escapeHtml(p.status)}</span>
+       <div class="visual-inner">
+         <div class="cover-head">
+           <span class="cover-chip">${escapeHtml(typeTag(p))}</span>
+           <span class="cover-mini">${escapeHtml(areaTag(p))}</span>
+         </div>
+         <div class="cover-art">
+           <div class="cover-orb orb-a"></div>
+           <div class="cover-orb orb-b"></div>
+           <div class="cover-cardlet">
+             <small>${escapeHtml(areaTag(p))}</small>
+             <b>${escapeHtml(themeLetter(p))}</b>
+           </div>
+         </div>
+         <div class="cover-foot">
+           <span>${escapeHtml(p.mode)}</span>
+           <strong>${escapeHtml(p.duration || p.type)}</strong>
+         </div>
+       </div>
+     </div>
      <div class="card-body"><span class="type">${escapeHtml(p.type)}${p.duration?' · '+escapeHtml(p.duration):''}</span><h3>${escapeHtml(p.title)}</h3><div class="meta">${metas}</div><div class="card-link"><span>Veure programa</span><span>→</span></div></div></a>`;
  }
  function renderOferta(){
    const grid=document.querySelector('#programGrid'); if(!grid)return;
+   document.body.classList.add('page-offer');
    grid.innerHTML=P.map(card).join('');
    const q=document.querySelector('#q'),area=document.querySelector('#area'),mode=document.querySelector('#mode'),type=document.querySelector('#type'),count=document.querySelector('#resultCount');
    const norm=s=>(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+   function updateStage(){
+     const max=Math.max(document.documentElement.scrollHeight-innerHeight,1);
+     const r=scrollY/max;
+     const stage = r < .22 ? '1' : r < .48 ? '2' : r < .74 ? '3' : '4';
+     document.body.setAttribute('data-scroll-stage', stage);
+   }
    function run(){
      let n=0;
      grid.querySelectorAll('.program-card').forEach((el,i)=>{
@@ -558,11 +605,14 @@ window.PROGRAMS = [
        const oka=!area.value||norm(p.area).includes(norm(area.value));
        const okm=!mode.value||norm(p.mode).includes(norm(mode.value));
        const okt=!type.value||norm(p.type).includes(norm(type.value));
-       const ok=okq&&oka&&okm&&okt; el.style.display=ok?'flex':'none'; if(ok)n++;
+       const ok=okq&&oka&&okm&&okt; el.style.display=ok?'':'none'; if(ok)n++;
      });
      count.textContent=n+' programes';
    }
-   [q,area,mode,type].forEach(x=>x&&x.addEventListener('input',run));run();
+   [q,area,mode,type].forEach(x=>x&&x.addEventListener('input',run));
+   window.addEventListener('scroll', updateStage, {passive:true});
+   run();
+   updateStage();
  }
  function renderProgram(){
    const slug=document.body.dataset.program; if(!slug)return;
