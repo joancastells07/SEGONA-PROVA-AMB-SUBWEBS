@@ -563,23 +563,23 @@ window.PROGRAMS = [
    const base=(prefix?prefix+'/':'')+'assets/images/';
    const slug=(p.slug||'').toLowerCase();
    const tone=(p.tone||'').toLowerCase();
-   if(slug.includes('sport')) return base+'sports.jpg';
-   if(slug.includes('omics') || slug.includes('bio')) return base+'bioscience.jpg';
-   if(slug.includes('traduccio') || slug.includes('catala') || slug.includes('lleng')) return base+'languages.jpg';
-   if(slug.includes('documental') || slug.includes('comunicacio') || slug.includes('peritatge')) return base+'documentary.jpg';
-   if(slug.includes('neurolog') || slug.includes('neuro') || slug.includes('estimulacio')) return base+'neuro.jpg';
-   if(slug.includes('palli') || slug.includes('aicp') || slug.includes('cures') || slug.includes('anest') || slug.includes('dolor') || slug.includes('malaltia-mental') || slug.includes('discapacitat')) return base+'care.jpg';
-   if(slug.includes('dades') || slug.includes('data') || slug.includes('ia') || slug.includes('transformacio')) return base+'data-ai.jpg';
-   if(slug.includes('educacio') || slug.includes('professorat')) return base+'education.jpg';
-   if(slug.includes('mba') || slug.includes('empresa') || slug.includes('vendes') || slug.includes('lideratge') || slug.includes('family-business')) return base+'business.jpg';
-   const fallbacks={empresa:'business.jpg',esport:'sports.jpg',educacio:'education.jpg',salut:'care.jpg',social:'documentary.jpg',arts:'documentary.jpg',biociencies:'bioscience.jpg',llengues:'languages.jpg',comunicacio:'documentary.jpg'};
-   return base+(fallbacks[tone]||'business.jpg');
+   if(slug.includes('sport')) return base+'sports.webp';
+   if(slug.includes('omics') || slug.includes('bio')) return base+'bioscience.webp';
+   if(slug.includes('traduccio') || slug.includes('catala') || slug.includes('lleng')) return base+'languages.webp';
+   if(slug.includes('documental') || slug.includes('comunicacio') || slug.includes('peritatge')) return base+'documentary.webp';
+   if(slug.includes('neurolog') || slug.includes('neuro') || slug.includes('estimulacio')) return base+'neuro.webp';
+   if(slug.includes('palli') || slug.includes('aicp') || slug.includes('cures') || slug.includes('anest') || slug.includes('dolor') || slug.includes('malaltia-mental') || slug.includes('discapacitat')) return base+'care.webp';
+   if(slug.includes('dades') || slug.includes('data') || slug.includes('ia') || slug.includes('transformacio')) return base+'data-ai.webp';
+   if(slug.includes('educacio') || slug.includes('professorat')) return base+'education.webp';
+   if(slug.includes('mba') || slug.includes('empresa') || slug.includes('vendes') || slug.includes('lideratge') || slug.includes('family-business')) return base+'business.webp';
+   const fallbacks={empresa:'business.webp',esport:'sports.webp',educacio:'education.webp',salut:'care.webp',social:'documentary.webp',arts:'documentary.webp',biociencies:'bioscience.webp',llengues:'languages.webp',comunicacio:'documentary.webp'};
+   return base+(fallbacks[tone]||'business.webp');
  }
  function card(p){
    const metas=[p.mode,p.location,p.start].filter(Boolean).map(x=>`<span>${escapeHtml(x)}</span>`).join('');
    return `<a class="card program-card" data-slug="${escapeHtml(p.slug)}" data-area="${escapeHtml(p.area.toLowerCase())}" data-mode="${escapeHtml(p.mode.toLowerCase())}" data-type="${escapeHtml(p.type.toLowerCase())}" href="programes/${p.slug}.html">
-     <div class="visual ${p.tone||'empresa'}" style="--cover-image:url('${imageForProgram(p)}')">
-       <div class="visual-photo"></div>
+     <div class="visual ${p.tone||'empresa'}">
+       <img class="visual-photo" src="${imageForProgram(p)}" alt="" loading="lazy" decoding="async" width="1200" height="675">
        <span class="badge">${escapeHtml(p.status)}</span>
        <div class="visual-inner">
          <div class="cover-head">
@@ -654,8 +654,8 @@ window.PROGRAMS = [
       <div class="fact"><small>Inici</small><b>${escapeHtml(p.start)}</b></div>${extra}
     </div></div>
    </div></section>
-   <section class="program-showcase"><div class="container"><div class="program-media ${p.tone||'empresa'} reveal" style="--cover-image:url('${imageForProgram(p,'..')}')">
-      <div class="program-media-photo"></div>
+   <section class="program-showcase"><div class="container"><div class="program-media ${p.tone||'empresa'} reveal">
+      <img class="program-media-photo" src="${imageForProgram(p,'..')}" alt="" decoding="async" fetchpriority="high" width="1200" height="675">
       <div class="program-media-overlay">
         <div class="program-media-top"><span class="media-pill">${escapeHtml(typeTag(p))}</span><span class="media-pill ghost">${escapeHtml(areaTag(p))}</span></div>
         <div class="program-media-bottom"><h3>${escapeHtml(p.title)}</h3><p>${escapeHtml(p.intro)}</p></div>
